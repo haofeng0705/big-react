@@ -19,6 +19,7 @@ export default [
 		},
 		plugins: [
 			...getBaseRollupPlugins(), // 获取基础的rollup插件
+			// 生成package.json
 			generatePackageJson({
 				inputFolder: pkgPath,
 				outputFolder: pkgDistPath,
