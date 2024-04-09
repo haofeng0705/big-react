@@ -20,6 +20,11 @@
         "noImplicitReturns": false,
         "skipLibCheck": true,
         // ts 基础的入口
-        "baseUrl": "./packages"
+        "baseUrl": "./packages",
+        "paths": {
+            "hostConfig": [
+                "./react-reconciler/src/hostConfig.ts"
+            ]
+        }
     }
 }

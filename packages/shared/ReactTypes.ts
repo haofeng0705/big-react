@@ -12,3 +12,6 @@ export interface ReactElementType {
 	ref: Ref;
 	__mark: string;
 }
+
+// 类型别名的泛型写法, 对应了 setState 的两种用法
+export type Action<State> = State | ((prevState: State) => State);
