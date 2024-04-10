@@ -4,6 +4,7 @@ import { FiberNode } from './fiber';
 
 let workInProgress: FiberNode | null = null;
 
+// hostRootFiber的 wip
 function prepareFreshStack(fiber: FiberNode) {
 	workInProgress = fiber;
 }
@@ -35,7 +36,9 @@ function renderRoot(root: FiberNode) {
 			workLoop();
 			break;
 		} catch (e) {
-			console.warn('workLoop 发生错误', e);
+			if (__DEV__) {
+				console.warn('workLoop 发生错误', e);
+			}
 		}
 	} while (true);
 }
