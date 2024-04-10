@@ -4,6 +4,7 @@
 	"description": "React 协调器",
 	"module": "index.ts",
 	"dependencies": {
+		"@rollup/plugin-replace": "^5.0.5",
 		"shared": "workspace:*"
 	},
 	"scripts": {
