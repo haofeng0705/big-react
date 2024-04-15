@@ -1,13 +1,14 @@
 import { beginWork } from './beginWork';
 import { completeWork } from './completeWork';
-import { FiberNode } from './fiber';
+import { createWorkInProgress, FiberNode, FiberRootNode } from './fiber';
+import { HostRoot } from './workTags';
 
 let workInProgress: FiberNode | null = null;
 
-// hostRootFiber的 wip
-function prepareFreshStack(fiber: FiberNode) {
-	workInProgress = fiber;
+function prepareFreshStack(root: FiberRootNode) {
+	workInProgress = createWorkInProgress(root.current, {});
 }
+
 export function scheduleUpdateOnFiber(fiber: FiberNode) {
 	// TODO 调度功能
 	// fiberRootNode
@@ -27,7 +28,8 @@ function markUpdateFromFiberToRoot(fiber: FiberNode) {
 	}
 	return null;
 }
-function renderRoot(root: FiberNode) {
+
+function renderRoot(root: FiberRootNode) {
 	// 初始化
 	prepareFreshStack(root);
 
@@ -37,15 +39,22 @@ function renderRoot(root: FiberNode) {
 			break;
 		} catch (e) {
 			if (__DEV__) {
-				console.warn('workLoop 发生错误', e);
+				console.warn('workLoop发生错误', e);
 			}
+			workInProgress = null;
 		}
 	} while (true);
+
+	const finishedWork = root.current.alternate;
+	root.finishedWork = finishedWork;
+
+	// wip fiberNode树 树中的flags 执行具体的 dom 操作
+	commitRoot(root);
 }
 
 function workLoop() {
 	while (workInProgress !== null) {
-		workInProgress = performUnitOfWork(workInProgress);
+		performUnitOfWork(workInProgress);
 	}
 }
 
@@ -53,17 +62,19 @@ function performUnitOfWork(fiber: FiberNode) {
 	// 1. beginWork
 	const next = beginWork(fiber);
 	fiber.memoizedProps = fiber.pendingProps;
+
 	if (next === null) {
 		// 2. completeUnitOfWork
 		completeUnitOfWork(fiber);
 	} else {
-		workInProgress = next; //继续向下遍历
+		workInProgress = next;
 	}
 }
 
 function completeUnitOfWork(fiber: FiberNode) {
 	// 3. completeWork
 	let node: FiberNode | null = fiber;
+
 	do {
 		completeWork(node);
 		const sibling = node.sibling;
@@ -73,5 +84,6 @@ function completeUnitOfWork(fiber: FiberNode) {
 			return;
 		}
 		node = node.return;
+		workInProgress = node;
 	} while (node !== null);
 }

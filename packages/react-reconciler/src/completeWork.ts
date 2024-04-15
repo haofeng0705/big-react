@@ -50,6 +50,7 @@ export const completeWork = (wip: FiberNode) => {
 function appendAllChildren(parent: FiberNode, wip: FiberNode) {
 	let node = wip.child;
 
+	// 递归遍历子节点
 	while (node !== null) {
 		if (node.tag === HostComponent || node.tag === HostText) {
 			appendInitialChild(parent, node?.stateNode);
@@ -58,13 +59,14 @@ function appendAllChildren(parent: FiberNode, wip: FiberNode) {
 			node = node.child;
 			continue;
 		}
-
+		// 终止条件
 		if (node === wip) {
 			return;
 		}
-
+		// 兄弟节点
 		while (node.sibling === null) {
 			if (node.return === null || node.return === wip) {
+				// 往上找到父节点(归)
 				return;
 			}
 			node = node?.return;
@@ -74,11 +76,13 @@ function appendAllChildren(parent: FiberNode, wip: FiberNode) {
 	}
 }
 
+// 将子节点的标记向上传递(冒泡)
 function bubbleProperties(wip: FiberNode) {
 	let subtreeFlags = NoFlags;
 	let child = wip.child;
 
 	while (child !== null) {
+		// 位操作-收集子节点的标记
 		subtreeFlags |= child.subtreeFlags;
 		subtreeFlags |= child.flags;
 

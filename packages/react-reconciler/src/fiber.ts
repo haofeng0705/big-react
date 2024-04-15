@@ -20,6 +20,7 @@ export class FiberNode {
 	memoizedProps: Props | null;
 	alternate: FiberNode | null; // 用于双缓存技术，如果当前fibernode 是 current，则 alternate 是 workInProgress，反之亦然
 	flags: Flags; // 用于标记当前节点的状态
+	subtreeFlags: Flags; // 用于标记子树的状态
 
 	constructor(tag: WorkTag, pendingProps: Props, key: Key) {
 		// 在构造函数中初始化属性
@@ -46,6 +47,7 @@ export class FiberNode {
 
 		// 副作用标记
 		this.flags = NoFlags; // 标记当前节点的状态
+		this.subtreeFlags = NoFlags; // 标记子树的状态
 	}
 }
 
