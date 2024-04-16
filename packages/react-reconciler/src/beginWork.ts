@@ -2,7 +2,13 @@ import { ReactElementType } from 'shared/ReactTypes';
 import { mountChildFibers, reconcileChildFibers } from './childFibers';
 import { FiberNode } from './fiber';
 import { UpdateQueue, processUpdateQueue } from './updateQueue';
-import { HostRoot, HostComponent, HostText } from './workTags';
+import {
+	HostRoot,
+	HostComponent,
+	HostText,
+	FunctionComponent
+} from './workTags';
+import { renderWithHooks } from './fiberHooks';
 
 // 递归中的递阶段
 export const beginWork = (wip: FiberNode) => {
@@ -14,6 +20,8 @@ export const beginWork = (wip: FiberNode) => {
 			return updateHostComponent(wip);
 		case HostText:
 			return null; // 文本节点不需要更新，没有子节点(叶子结点,递到这里就结束了)
+		case FunctionComponent:
+			return updateFunctionComponent(wip);
 		default:
 			if (__DEV__) {
 				console.warn('beginWork未实现的类型');
@@ -22,6 +30,13 @@ export const beginWork = (wip: FiberNode) => {
 	}
 	return null;
 };
+
+function updateFunctionComponent(wip: FiberNode) {
+	const nextChildren = renderWithHooks(wip);
+	reconcileChildren(wip, nextChildren);
+	return wip.child;
+}
+
 function updateHostRoot(wip: FiberNode) {
 	const baseState = wip.memoizedState; // wip 的 memoizedState 是上一次的状态，对首屏来说是 null
 	const updateQueue = wip.updateQueue as UpdateQueue<Element>; // wip 的 updateQueue 是上一次的更新队列

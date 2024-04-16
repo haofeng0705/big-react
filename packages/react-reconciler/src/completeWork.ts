@@ -6,7 +6,12 @@ import {
 } from 'hostConfig';
 import { FiberNode } from './fiber';
 import { NoFlags } from './fiberFlags';
-import { HostRoot, HostText, HostComponent } from './workTags';
+import {
+	HostRoot,
+	HostText,
+	HostComponent,
+	FunctionComponent
+} from './workTags';
 
 export const completeWork = (wip: FiberNode) => {
 	// 递归中的归
@@ -38,6 +43,9 @@ export const completeWork = (wip: FiberNode) => {
 			bubbleProperties(wip);
 			return null;
 		case HostRoot:
+			bubbleProperties(wip);
+			return null;
+		case FunctionComponent:
 			bubbleProperties(wip);
 			return null;
 
